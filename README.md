@@ -20,3 +20,6 @@ Exemplo:
 ```text
 feat(governance): add conventional commit instructions
 ```
+## Primeiro teste da memória de construção
+
+Este repositório iniciou sua operação utilizando GitHub, VS Code e GitHub Copilot para registrar a evolução da NAVE.
