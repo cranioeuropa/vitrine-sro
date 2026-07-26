@@ -1,0 +1,45 @@
+name: Validate commit messages
+
+on:
+  push:
+    branches:
+      - main
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  conventional-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check commit messages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const allowed = /^(feat|fix|refactor|test|docs|chore|ci|perf|security)(\([a-z0-9-]+\))?: .+/;
+            const commits = context.payload.commits ?? [];
+
+            if (context.eventName === 'pull_request') {
+              const { owner, repo } = context.repo;
+              const pull_number = context.payload.pull_request.number;
+              const response = await github.paginate(
+                github.rest.pulls.listCommits,
+                { owner, repo, pull_number, per_page: 100 }
+              );
+
+              for (const commit of response) {
+                const title = commit.commit.message.split('\n')[0];
+                if (!allowed.test(title)) {
+                  core.setFailed(`Mensagem fora do padrão: ${title}`);
+                }
+              }
+              return;
+            }
+
+            for (const commit of commits) {
+              const title = commit.message.split('\n')[0];
+              if (!allowed.test(title)) {
+                core.setFailed(`Mensagem fora do padrão: ${title}`);
+              }
+            }
