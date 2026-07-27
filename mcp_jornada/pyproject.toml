@@ -1,0 +1,13 @@
+[project]
+name = "mcp-jornada-aluno"
+version = "0.1.0"
+description = "MCP da Linha de Continuidade da Jornada do Aluno"
+requires-python = ">=3.11"
+dependencies = [
+  "mcp[cli]>=1.27,<2",
+  "httpx>=0.27,<1",
+  "pydantic>=2.7,<3",
+]
+
+[project.scripts]
+mcp-jornada = "server:main"

@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0",
+  "operations": {
+    "health_repo": {
+      "enabled": true,
+      "cwd": ".",
+      "command": ["python", "-c", "from pathlib import Path; print('repo_ok=', Path('.').resolve()); print('bridge=alive')"],
+      "timeout_seconds": 30
+    },
+    "git_status": {
+      "enabled": true,
+      "cwd": ".",
+      "command": ["git", "status", "--short", "--branch"],
+      "timeout_seconds": 30
+    },
+    "git_pull_current_branch": {
+      "enabled": true,
+      "cwd": ".",
+      "command": ["git", "pull", "--ff-only"],
+      "timeout_seconds": 120
+    },
+    "test_cap_aca_002": {
+      "enabled": true,
+      "cwd": "automacao_constancia",
+      "command": ["python", "-m", "pytest", "-q", "-vv"],
+      "timeout_seconds": 180
+    },
+    "health_cap_aca_002": {
+      "enabled": true,
+      "cwd": "automacao_constancia",
+      "command": ["python", "-c", "import api, runner; print(api.health())"],
+      "timeout_seconds": 60
+    }
+  }
+}

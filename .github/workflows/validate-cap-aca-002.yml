@@ -1,0 +1,42 @@
+name: Validate CAP-ACA-002
+
+on:
+  push:
+    paths:
+      - "automacao_constancia/**"
+      - ".github/workflows/validate-cap-aca-002.yml"
+  pull_request:
+    paths:
+      - "automacao_constancia/**"
+      - ".github/workflows/validate-cap-aca-002.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: automacao_constancia
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: automacao_constancia/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Validate imports
+        run: python -c "import api; import runner"
+
+      - name: Run decision tests
+        run: pytest -q

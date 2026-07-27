@@ -1,0 +1,97 @@
+{
+  "name": "NAVE | CAP-ACA-002 | Ciclo de Constância",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nave/cap-aca-002/ciclo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-entrada",
+      "name": "Receber ciclo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body ?? $json;\nconst required = ['acompanhamento_id','reacao','comportamento_7_dias','treinos_7_dias'];\nconst missing = required.filter(k => b[k] === undefined || b[k] === null || b[k] === '');\nif (missing.length) throw new Error(`Campos ausentes: ${missing.join(', ')}`);\nreturn [{json:{...b, treinos_7_dias:Number(b.treinos_7_dias)}}];"
+      },
+      "id": "validar",
+      "name": "Validar entrada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NAVE_CAP_ACA_002_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-NAVE-KEY",
+              "value": "={{$env.NAVE_INTERNAL_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify($json)}}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "executar-motor",
+      "name": "Executar CAP-ACA-002",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "recibo",
+      "name": "Retornar recibo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [700, 0]
+    }
+  ],
+  "connections": {
+    "Receber ciclo": {
+      "main": [[{"node":"Validar entrada","type":"main","index":0}]]
+    },
+    "Validar entrada": {
+      "main": [[{"node":"Executar CAP-ACA-002","type":"main","index":0}]]
+    },
+    "Executar CAP-ACA-002": {
+      "main": [[{"node":"Retornar recibo","type":"main","index":0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "active": false,
+  "versionId": "cap-aca-002-v040",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": [
+    {"name":"NAVE"},
+    {"name":"Academia"},
+    {"name":"CAP-ACA-002"}
+  ]
+}
